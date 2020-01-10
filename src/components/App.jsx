@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import Home from "./Home"
+import React, { Component } from 'react';
+import Home from "./Home";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export class App extends Component {
@@ -9,7 +9,7 @@ export class App extends Component {
                 <Home/>
             </div>
         )
-    }
-}
+    };
+};
 
 export default App

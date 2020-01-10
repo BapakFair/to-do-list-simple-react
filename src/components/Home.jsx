@@ -1,53 +1,20 @@
-import React, { Component, useState } from 'react'
-import ReactDOM from "react-dom";
-import { Card, Form, Button, Table, FormCheck } from 'react-bootstrap'
-// import './style.css'
-import Swal from 'sweetalert2'
-import Modal from 'react-bootstrap/Modal'
+import React, { Component } from 'react';
+import { Card, Button, Table, Modal } from 'react-bootstrap';
+import { connect } from 'react-redux'
 
-export class Home extends Component {
+class Home extends Component {
     state = {
             title:"",
             description:"",
-        
-        list: [
-            {   "id": 1,
-                "title": "Make a meal",
-                "description":"lorem ipsum",
-                "status": 0,
-                "createdAt": "2019-11-15 18:00"
-            },
-            {   "id": 2,
-                "title": "Dinner with family",
-                "description":"lorem ipsum",
-                "status": 0,
-                "createdAt":"2019-11-16 18:00"
-            },
-            {   "id": 3,
-                "title": "Watch scary movie",
-                "description": "lorem ipsum",
-                "status": 0,
-                "createdAt": "2019-11-15 13:00"
-            },
-            {   "id": 4,
-                "title": "Learn something new",
-                "description": "lorem ipsum",
-                "status": 1,
-                "createdAt": "2019-11-15 08:00"
-            },
-            {   "id": 5,
-                "title": "Make a phone call to mom",
-                "description": "lorem ipsum",
-                "status": 1,
-                "createdAt": "2019-11-15 04:00"
-            }
-        ]
-    }
+            show:false,
+            isi:[],
+            list: []
+    };
     
 
     updateInput(key, value) {
         this.setState({ [key]: value });
-    }
+    };
 
     addItem() {
         const newTask = {
@@ -62,11 +29,13 @@ export class Home extends Component {
         this.setState({
             list
         });
-    }
+    };
 
     showTask = () => {
-        let rendTask = this.state.list.map(val => {
-            if (val.status == 0) {
+        let urut = [...this.state.list]
+            urut = urut.sort((a, b) => a.createdAt - b.createdAt)
+        let rendTask = urut.map(val => {
+            if (val.status === 0) {
                 return (
                     <tr key={val.id}>
                         <td>{val.title}</td>
@@ -75,20 +44,62 @@ export class Home extends Component {
                             <Button className="btn btn-floating mr-2" variant="danger" onClick={() => this.deleteItem(val.id)}>
                                 <i class="material-icons">x </i>
                             </Button>
-                            <Button className="btn btn-floating" onClick={() => this.updateItem(val.id)}>
-                                <i class="material-icons"> update</i>
+                            <Button className="btn btn-floating" onClick={() => this.detailTask(val.id)}>
+                                <Modal show={this.state.show} onHide={()=> this.setState({show:false})}>
+                                    <Modal.Header closeButton> Detail </Modal.Header>
+                                    <Modal.Body>
+                                       <div>
+                                            id= {this.state.isi.id} <br />
+                                            title: {this.state.isi.title} <br /> 
+                                            status: {this.state.isi.status} <br />
+                                            description: {this.state.isi.description} <br />
+                                            createdAt: {this.state.isi.createdAt} <br />
+                                       </div>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button onClick={()=>{this.onShowHandler()}}>
+                                            Close
+                                        </Button>
+                                        <Button>
+                                            Save
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
+                                detail
                             </Button>
                         </td>
                     </tr>
-                )
-            }
-        })
+                );
+            };
+        });
         return rendTask
-    }
+    };
+
+    onShowHandler(){
+        this.setState({show:false});
+    };
+
+    detailTask(id) {
+        this.setState({ show: !this.state.show});
+
+        const list = [...this.state.list];
+        const dataIsi = list.filter(item => item.id === id);
+        const Isi = {
+                id: dataIsi[0].id,
+                title: dataIsi[0].title,
+                status: dataIsi[0].status,
+                description: dataIsi[0].description,
+                createdAt: dataIsi[0].createdAt
+         };
+        this.setState({
+            isi: Isi
+        });
+    };
+    
 
     showTaskDone = () => {
         let rendTask = this.state.list.map(val => {
-            if (val.status == 1) {
+            if (val.status === 1) {
                 return (
                     <tr>
                         <td><strike><i>{val.title}</i></strike></td>
@@ -96,17 +107,17 @@ export class Home extends Component {
                             <Button variant="danger" onClick={() => { this.cancelTask(val.id) }} className="mr-3">Cancel</Button>
                         </td>
                     </tr>
-                )   
+                ) 
             }
         })
         return rendTask
-    }
+    };
 
     deleteItem(id) {
         const list = [...this.state.list];
         const updatedList = list.filter(item => item.id !== id);
         this.setState({ list: updatedList });
-    }
+    };
 
     cancelTask(id) {
         const list = [...this.state.list];
@@ -118,11 +129,10 @@ export class Home extends Component {
             status: 0,
             description: dataUpdate[0].description,
             createdAt: new Date()
-        }
-        console.log(dataPush)
+        };
         let List = [...updatedList, dataPush]
         this.setState({ list: List });
-    }
+    };
 
     doneTask(id) {
         const list = [...this.state.list];
@@ -134,19 +144,24 @@ export class Home extends Component {
             status: 1,
             description: dataUpdate[0].description,
             createdAt: new Date()   
-        }
-        console.log(dataPush)
+        };
         let List = [...updatedList, dataPush]
         this.setState({ list: List });
-    }
+    };
+
+    componentDidMount(){
+        this.setState({list:this.props.LIST})
+    };
     
     render() {
+        // console.log(GlobalState)
+        console.log(this.props.LIST)
         return (
             <div className="row container mt-2 ">
-                <div className="col-8" style={{marginLeft:"auto", marginRight:"auto"}}>
+                <div className="col-2" style={{marginLeft:"auto", marginRight:"auto", marginTop:15}}>
                     <Card style={{ width: '90%' }} className="p-2 ml-4">
                         <Card>
-                            <h2 className="mx-auto mt-2 mb-2">To do list</h2>
+                            <h2 className="mx-auto mt-2 mb-2">To do</h2>
                             <hr className="w-50 mx-auto"></hr>
                             
                             <input
@@ -160,6 +175,7 @@ export class Home extends Component {
                                 placeholder="Type description here"
                                 value={this.state.description}
                                 onChange={e => this.updateInput("description", e.target.value)}
+
                             />
                             <button
                                 className="add-btn btn-floating"
@@ -172,7 +188,7 @@ export class Home extends Component {
                     </Card>
                 </div>
                     
-                    <div className="col-6 " style={{marginLeft: "auto", marginTop: 15}}>
+                    <div className="col-5 " style={{marginLeft: "auto", marginTop: 15}}>
                         <Card style={{ width: 'auto' }} className=" p-2">
                             <Table striped bordered hover>
                                 <thead className="text-center">
@@ -188,12 +204,12 @@ export class Home extends Component {
                         </Card>
                     </div>
 
-                    <div className="col-6" style={{marginRight: "auto", marginTop: 15}}>
+                    <div className="col-5" style={{marginRight: "auto", marginTop: 15}}>
                         <Card style={{ width: 'auto' }} className=" p-2">
                             <Table striped bordered hover>
                                 <thead className="text-center">
                                     <tr>
-                                        <th style={{ width: '31rem' }}><h1 className="mt-1">List Tasks Done</h1></th>
+                                        <th style={{ width: '31rem' }}><h1 className="mt-1">List Done</h1></th>
                                         <th><h5 className="mt-1 mb-3 mx-auto">Action</h5></th>
                                     </tr>
                                 </thead>
@@ -204,8 +220,13 @@ export class Home extends Component {
                         </Card>
                     </div>
             </div>
-        )
+        );
+    };
+};
+
+const mapStateToProps = (state) => {
+    return {
+        LIST: state
     }
 }
-
-export default Home
+export default connect(mapStateToProps)(Home);
