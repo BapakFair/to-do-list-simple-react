@@ -1,0 +1,59 @@
+.containerr {
+    max-width: 1400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.todo {
+    margin-top:15px;
+    flex:1;
+    width: 90%;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.cardTodo {
+    padding: 2px;
+    margin-left: 2px;
+}
+
+.addTask {
+    margin: 5px;
+    width: 80%;
+    align-self: center;
+}
+
+.show {
+    margin-top: 15px;
+    flex: 2;
+    width: 90%;
+    box-sizing: border-box;
+    padding: 20px;
+}
+@media (min-width: 900px ) {
+    .containerr {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+@media (min-width: 900px) {
+    .todo {
+        margin-top:15px;
+        flex:1;
+        width: 90%;
+        box-sizing: border-box;
+        padding: 20px;
+    }
+}
+@media (min-width: 900px) {
+    .show {
+        margin-top: 15px;
+        flex: 1;
+        width: 90%;
+        box-sizing: border-box;
+        padding: 20px;
+    }
+}

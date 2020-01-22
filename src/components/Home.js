@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Card, Button, Table, Modal } from 'react-bootstrap';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import "./Home.css";
 
 class Home extends Component {
     state = {
             title:"",
+            status:0,
             description:"",
             show:false,
             isi:[],
@@ -17,12 +19,14 @@ class Home extends Component {
     };
 
     addItem() {
+        var d = new Date();
+        var waktu = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes();
         const newTask = {
             id: 1 + Math.random(),
             title: this.state.title,
-            status:0,
+            status: this.state.status,
             description: this.state.description,
-            createdAt: new Date()
+            createdAt: waktu
         };
         const list = [...this.state.list];
         list.push(newTask);
@@ -30,6 +34,54 @@ class Home extends Component {
             list
         });
     };
+
+    updateItem() {
+        var d = new Date();
+        var waktu = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes();
+        let newTask = {
+            id: this.state.isi.id,
+            title: this.state.title,
+            status: this.state.status,
+            description: this.state.description,
+            createdAt: waktu
+        }
+        if(!this.state.title){
+            newTask = {
+            id: this.state.isi.id,
+            title: this.state.isi.title,
+            status: this.state.status,
+            description: this.state.description,
+            createdAt: waktu
+        };
+        }
+        if (!this.state.description) {
+            newTask = {
+                id: this.state.isi.id,
+                title: this.state.title,
+                status: this.state.status,
+                description: this.state.isi.description,
+                createdAt: waktu
+            };
+        }
+        const list = [...this.state.list];
+        const data = list.filter(item => item.id !== this.state.isi.id);
+        data.push(newTask);
+        this.setState({
+            list:data,
+            title: "",
+            description: "",
+            show:false
+        });
+    };
+
+
+    titleHandler(e){
+            this.setState({ title: e.target.value }) 
+        } 
+    
+    desHandler(e){
+        this.setState({description : e.target.value})
+    }
 
     showTask = () => {
         let urut = [...this.state.list]
@@ -40,33 +92,45 @@ class Home extends Component {
                     <tr key={val.id}>
                         <td>{val.title}</td>
                         <td>
-                            <Button variant="success" onClick={() => { this.doneTask(val.id) }} className="mr-2">Done</Button>
-                            <Button className="btn btn-floating mr-2" variant="danger" onClick={() => this.deleteItem(val.id)}>
-                                <i class="material-icons">x </i>
+                            <div className="row">
+                            <Button variant="success" onClick={() => { this.doneTask(val.id) }} className="mr-1">Done</Button>
+                            <Button className="btn btn-floating mr-1" variant="danger" onClick={() => this.deleteItem(val.id)}>
+                                <i className="material-icons">Del </i>
                             </Button>
                             <Button className="btn btn-floating" onClick={() => this.detailTask(val.id)}>
-                                <Modal show={this.state.show} onHide={()=> this.setState({show:false})}>
+                                <Modal 
+                                    show={this.state.show} 
+                                    onHide={()=> this.setState({show:false})}
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                        }}
+                                                            >
                                     <Modal.Header closeButton> Detail </Modal.Header>
                                     <Modal.Body>
-                                       <div>
-                                            id= {this.state.isi.id} <br />
-                                            title: {this.state.isi.title} <br /> 
-                                            status: {this.state.isi.status} <br />
-                                            description: {this.state.isi.description} <br />
-                                            createdAt: {this.state.isi.createdAt} <br />
-                                       </div>
+                                        <div>
+                                                <p> id =  {this.state.isi.id}</p>
+                                                <p> title = <input defaultValue={this.state.isi.title} onChange={(e) => this.titleHandler(e)} /></p>
+                                                <p> status = {this.state.isi.status}</p>
+                                                <p> description = <input defaultValue={this.state.isi.description} onChange={(e) => this.desHandler(e)} /></p>
+                                        </div>     
                                     </Modal.Body>
                                     <Modal.Footer>
-                                        <Button onClick={()=>{this.onShowHandler()}}>
-                                            Close
+                                        <Button 
+                                            onClick={()=>{this.updateItem()}}
+                                            >
+                                            Update
                                         </Button>
-                                        <Button>
-                                            Save
+                                        <Button 
+                                            variant= "secondary"
+                                            onClick={()=> {this.setState({show:false})}}
+                                            >
+                                            Close
                                         </Button>
                                     </Modal.Footer>
                                 </Modal>
                                 detail
                             </Button>
+                            </div>
                         </td>
                     </tr>
                 );
@@ -94,6 +158,7 @@ class Home extends Component {
         this.setState({
             isi: Isi
         });
+        console.log(dataIsi)
     };
     
 
@@ -128,7 +193,7 @@ class Home extends Component {
             title: dataUpdate[0].title,
             status: 0,
             description: dataUpdate[0].description,
-            createdAt: new Date()
+            createdAt: dataUpdate[0].createdAt
         };
         let List = [...updatedList, dataPush]
         this.setState({ list: List });
@@ -143,7 +208,7 @@ class Home extends Component {
             title: dataUpdate[0].title,
             status: 1,
             description: dataUpdate[0].description,
-            createdAt: new Date()   
+            createdAt: dataUpdate[0].createdAt
         };
         let List = [...updatedList, dataPush]
         this.setState({ list: List });
@@ -154,42 +219,42 @@ class Home extends Component {
     };
     
     render() {
-        // console.log(GlobalState)
-        console.log(this.props.LIST)
+
+        console.log(this.state.id)
         return (
-            <div className="row container mt-2 ">
-                <div className="col-2" style={{marginLeft:"auto", marginRight:"auto", marginTop:15}}>
-                    <Card style={{ width: '90%' }} className="p-2 ml-4">
+            <div className= "containerr " >
+                <div className= "todo" >
+                    {/* <Card> */}
                         <Card>
-                            <h2 className="mx-auto mt-2 mb-2">To do</h2>
-                            <hr className="w-50 mx-auto"></hr>
-                            
+                            <h2 className="mt-2 mb-2">To do</h2>                            
                             <input
+                                style={{ margin:3}}
                                 type="text"
                                 placeholder="Type task here"
                                 value={this.state.title}
                                 onChange={e => this.updateInput("title", e.target.value)}
                             />
                             <input
+                                style={{margin:3}}
                                 type="text"
                                 placeholder="Type description here"
                                 value={this.state.description}
                                 onChange={e => this.updateInput("description", e.target.value)}
 
                             />
-                            <button
-                                className="add-btn btn-floating"
+                            <Button
+                                className="add-btn btn-floating addTask"
                                 onClick={() => this.addItem()}
                             >
-                                <i class="material-icons"> Add Task </i>
-                            </button>
+                                <i className="material-icons"> Add Task </i>
+                            </Button>
                             
                         </Card>
-                    </Card>
+                    {/* </Card> */}
                 </div>
                     
-                    <div className="col-5 " style={{marginLeft: "auto", marginTop: 15}}>
-                        <Card style={{ width: 'auto' }} className=" p-2">
+                    <div className="show">
+                        {/* <Card> */}
                             <Table striped bordered hover>
                                 <thead className="text-center">
                                     <tr>
@@ -201,11 +266,11 @@ class Home extends Component {
                                     {this.showTask()}
                                 </tbody>
                             </Table>
-                        </Card>
+                        {/* </Card> */}
                     </div>
 
-                    <div className="col-5" style={{marginRight: "auto", marginTop: 15}}>
-                        <Card style={{ width: 'auto' }} className=" p-2">
+                    <div className="show">
+                        {/* <Card> */}
                             <Table striped bordered hover>
                                 <thead className="text-center">
                                     <tr>
@@ -217,7 +282,7 @@ class Home extends Component {
                                     {this.showTaskDone()}
                                 </tbody>
                             </Table>
-                        </Card>
+                        {/* </Card> */}
                     </div>
             </div>
         );
