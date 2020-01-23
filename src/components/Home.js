@@ -63,6 +63,15 @@ class Home extends Component {
                 createdAt: waktu
             };
         }
+        if (!this.state.description && !this.state.title) {
+            newTask = {
+                id: this.state.isi.id,
+                title: this.state.isi.title,
+                status: this.state.status,
+                description: this.state.isi.description,
+                createdAt: waktu
+            };
+        }
         const list = [...this.state.list];
         const data = list.filter(item => item.id !== this.state.isi.id);
         data.push(newTask);
@@ -158,7 +167,6 @@ class Home extends Component {
         this.setState({
             isi: Isi
         });
-        console.log(dataIsi)
     };
     
 
@@ -219,8 +227,6 @@ class Home extends Component {
     };
     
     render() {
-
-        console.log(this.state.id)
         return (
             <div className= "containerr " >
                 <div className= "todo" >
